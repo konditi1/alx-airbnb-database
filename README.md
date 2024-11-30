@@ -128,7 +128,9 @@ This repository contains SQL queries to insert sample data into the Airbnb-like 
     ```
 
 ## Usage
-
+```
+mysql -u username -p database_name < seed.sql
+```
 To insert sample data into the tables, run the provided SQL commands in your MySQL database.
 
 ## License
