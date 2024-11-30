@@ -134,4 +134,3 @@ To insert sample data into the tables, run the provided SQL commands in your MyS
 ## License
 
 This repository is licensed under the MIT License.
-
