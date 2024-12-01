@@ -337,4 +337,154 @@ WHERE Review.rating = 5 OR Review.rating IS NULL
 
 
 
+# Querying Average Ratings and User Bookings with Subqueries
 
+This document provides an overview of SQL queries that utilize subqueries and correlated subqueries to perform advanced data retrieval. The examples cover the following scenarios:
+
+1. Retrieving properties with an average rating greater than 4.0.
+2. Identifying users who have made more than three bookings.
+
+---
+
+## Table of Contents
+- [Understanding Subqueries](#understanding-subqueries)
+- [Implementation](#implementation)
+  - [Query 1: Properties with Average Rating > 4.0](#query-1-properties-with-average-rating-40)
+  - [Query 2: Users with More Than 3 Bookings](#query-2-users-with-more-than-3-bookings)
+- [Example Data](#example-data)
+- [Expected Results](#expected-results)
+- [Conclusion](#conclusion)
+
+---
+
+## Understanding Subqueries
+
+A subquery is a nested query used within a larger SQL query. Subqueries are often used in:
+
+1. **Filters**: To restrict the results of the main query.
+2. **Aggregations**: To calculate summary data for specific groups.
+
+### Types of Subqueries:
+1. **Standard Subquery**: Independent of the outer query.
+2. **Correlated Subquery**: Depends on the values from the outer query.
+
+---
+
+## Implementation
+
+### Query 1: Properties with Average Rating > 4.0
+
+This query retrieves properties where the average review rating exceeds 4.0. It uses a subquery in the `WHERE` clause.
+
+```sql
+SELECT
+    p.name AS property_name,
+    p.price_per_night,
+    p.availability_status
+FROM 
+    Property p
+WHERE
+    p.property_id IN (
+        SELECT 
+            r.property_id
+        FROM
+            Review r
+        GROUP BY
+            r.property_id
+        HAVING
+            AVG(r.rating) > 4.0
+    );
+```
+### Explanation:
+
+**Outer Query**:
+- Fetches property details: `name`, `price_per_night`, and `availability_status`.
+
+**Subquery**:
+1. Groups reviews by `property_id`.
+2. Computes the average rating using `AVG(r.rating)`.
+3. Filters properties with an average rating greater than 4.0 using the `HAVING` clause.
+
+---
+
+### Query 2: Users with More Than 3 Bookings
+
+This query identifies users who have made more than three bookings. It uses a correlated subquery in the `WHERE` clause.
+
+```sql
+SELECT 
+    u.user_id,
+    u.first_name,
+    u.last_name,
+    u.email,
+    u.phone_number,
+    u.role
+FROM 
+    User u
+WHERE 
+    (SELECT COUNT(*) 
+     FROM Booking b 
+     WHERE b.user_id = u.user_id) > 3;
+```
+### Explanation:
+
+**Outer Query**:
+- Fetches user details: `user_id`, `first_name`, `last_name`, `email`, `phone_number`, and `role`.
+
+**Correlated Subquery**:
+1. Counts the number of bookings (`COUNT(*)`) made by each user where `b.user_id = u.user_id`.
+2. Filters users with more than three bookings.
+
+---
+
+### Example Data
+
+**Property Table**:
+
+| property_id | name           | price_per_night | availability_status |
+|-------------|----------------|-----------------|---------------------|
+| P1          | Cozy Cottage   | 120.00          | available           |
+| P2          | City Apartment | 200.00          | unavailable         |
+
+**Review Table**:
+
+| review_id | property_id | rating |
+|-----------|-------------|--------|
+| R1        | P1          | 5      |
+| R2        | P1          | 4      |
+| R3        | P2          | 3      |
+| R4        | P2          | 5      |
+
+**User Table**:
+
+| user_id | first_name | last_name | email           | phone_number | role  |
+|---------|------------|-----------|-----------------|--------------|-------|
+| U1      | Alice      | Johnson   | alice@mail.com  | 1234567890   | guest |
+| U2      | Bob        | Smith     | bob@mail.com    | 9876543210   | guest |
+
+**Booking Table**:
+
+| booking_id | property_id | user_id | start_date | end_date   |
+|------------|-------------|---------|------------|------------|
+| B1         | P1          | U1      | 2024-01-01 | 2024-01-05 |
+| B2         | P2          | U1      | 2024-02-01 | 2024-02-03 |
+| B3         | P1          | U1      | 2024-03-01 | 2024-03-05 |
+| B4         | P3          | U1      | 2024-04-01 | 2024-04-05 |
+| B5         | P2          | U2      | 2024-01-10 | 2024-01-15 |
+
+---
+
+### Expected Results
+
+**Query 1: Properties with Average Rating > 4.0**
+
+| property_name | price_per_night | availability_status |
+|---------------|-----------------|---------------------|
+| Cozy Cottage  | 120.00          | available           |
+
+**Query 2: Users with More Than 3 Bookings**
+
+| user_id | first_name | last_name | email           | phone_number | role  |
+|---------|------------|-----------|-----------------|--------------|-------|
+| U1      | Alice      | Johnson   | alice@mail.com  | 1234567890   | guest |
+---
