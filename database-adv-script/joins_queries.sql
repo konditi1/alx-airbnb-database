@@ -35,14 +35,16 @@ SELECT
     r.review_id,
     r.rating,
     r.comment,
-    r.reviewed_by
+    r.reviewed_by,
     r.created_at AS review_created_on,
     r.updated_at AS review_updated_on
 FROM 
     Property p
 LEFT JOIN
     Review r 
-    USING (property_id);
+    USING (property_id)
+ORDER BY
+    r.rating DESC;
 
 -- A query using a FULL OUTER JOIN to retrieve all users and all bookings,
 -- even if the user has no booking or a booking is not linked to a user.
