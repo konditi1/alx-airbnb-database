@@ -1,8 +1,8 @@
 -- Drop the existing table if it exists
-DROP TABLE IF EXISTS Bookings;
+DROP TABLE IF EXISTS Booking;
 
 -- Create the Booking table with partitioning based on the start_date column
-CREATE TABLE Bookings (
+CREATE TABLE Booking (
     booking_id CHAR(36) NOT NULL,
     property_id CHAR(36) NOT NULL,
     user_id CHAR(36) NOT NULL,
@@ -27,12 +27,12 @@ PARTITION BY RANGE (YEAR(start_date)) (
 
 
 
--- Fetch bookings within a specific date range
+-- Fetch booking within a specific date range
 EXPLAIN ANALYZE
 SELECT 
     booking_id, property_id, user_id, start_date, end_date, total_price
 FROM 
-    Bookings
+    Booking
 WHERE 
     start_date BETWEEN '2022-01-01' AND '2022-12-31';
 
@@ -40,8 +40,8 @@ WHERE
 -- Non-partitioned Booking table
 DROP TABLE IF EXISTS Booking_non_partitioned;
 
-CREATE TABLE Booking_non_partitioned LIKE Bookings;
-INSERT INTO Booking_non_partitioned SELECT * FROM Bookings;
+CREATE TABLE Booking_non_partitioned LIKE Booking;
+INSERT INTO Booking_non_partitioned SELECT * FROM Booking;
 
 -- Test query
 EXPLAIN ANALYZE
